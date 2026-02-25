@@ -10,10 +10,11 @@ const getUser =(id) =>{
     })
 }
 
-const findUser = async(id)=>{
+const findUser = async (id) => {
     
-const user = await getUser(id);
-console.log(user)
+    console.log("Sync Code In Async Function")
+    const user = await getUser(id);
+    console.log("Data From API : ", user)
     
 }
 
