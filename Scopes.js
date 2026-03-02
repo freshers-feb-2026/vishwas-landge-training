@@ -27,7 +27,13 @@ if (true) {
   let city = "Pune";
   const country = "India";
 }
-
+this.add=function(){
+//this represets to the modul.exports in commonjs
+  console.log("Add function");
+}
+console.log("Global : "  ,global)
+console.log("This : "  ,  this)
+console.log("GlobalThis : "  ,globalThis)
 // console.log(city); Error
 
 // let and const are block scoped.
