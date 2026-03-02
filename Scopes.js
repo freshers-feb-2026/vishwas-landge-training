@@ -38,3 +38,24 @@ console.log("GlobalThis : "  ,globalThis)
 
 // let and const are block scoped.
 // var is function scoped.
+
+
+function getCounter() {
+  counter = 10; //this will define variable globally with var..
+  //  in strict mode will throw error 
+  return counter;
+}
+
+console.log(getCounter());
+
+var tx=20
+{
+  var tx=200
+  console.log("This is block : " , tx) //200
+}
+
+console.log("This is outside block : " , tx) //200
+var px=20;
+console.log(this.px) //it will show undefinde becauuse in node js 
+// In Node.js, var variables are scoped to the module wrapper function
+//  and do not attach to the global object
