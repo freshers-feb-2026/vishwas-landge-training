@@ -1,0 +1,23 @@
+Node.js is a JavaScript runtime environment that allows you to run 
+JavaScript outside the browser, mainly on the server.
+
+
+How Node.js Works
+
+1. Node.js is built on JavaScript + C/C++
+
+Your code is JavaScript.
+
+Under the hood, Node.js uses an engine called V8 (same as Chrome) to convert JS → Machine code.
+
+It also uses libuv (a C/C++ library) to handle background tasks.
+
+Flow  ===> 
+
+JavaScript Code
+      ↓
+Node.js Runtime
+      ↓
+V8 Engine (compiles JS → machine code)
+      ↓
+OS (File system, network, etc.)
