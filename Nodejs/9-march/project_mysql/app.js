@@ -1,28 +1,18 @@
 import express from "express"
-import db from "./lib/database";
+import userRouter from "./routes/users.route.js"
 
 const app = express();
 
 app.use(express.json());
 
-app.get("/", async (req, res) => {
+app.use((req, res , next)=>{  //track req for debugging
 
-    const result = await db.execute("SELECT * FROM users")
-    res.json({
-        message: "Hello World"
-    })
+    console.log(`${req.method} ===> ${req.url} `)
+    next();
 })
 
-app.post("/users", async (req, res) => {
 
-    const { name, email } = req.body;
-    const result = await db.execute("INSERT INTO users (name, email) VALUES (?, ?)", [name, email])
-    res.json({
-        message: "User created successfully",
-        userId: result[0].insertId
-    })
-}
-);
+app.use("/users" , userRouter)
 
 
 
