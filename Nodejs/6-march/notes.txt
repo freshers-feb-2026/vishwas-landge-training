@@ -1,0 +1,102 @@
+1. Library
+A library is a collection of functions that you call when you need them. ex. Lodash, Axios
+
+
+2. Framework 
+A framework controls the flow of the application and calls your code. ex. Express.js , Angular
+
+
+
+Express.js is a framework, not just a library.
+
+Example in Express:
+
+app.get("/users", (req, res) => {
+  res.send("Users list");
+});
+
+Here:
+Express decides when to run this function
+When a request arrives → Express calls your code
+
+Control Flow
+Framework → calls → Your Code
+
+
+
+
+
+Example :
+app.use('/user', (req, res, next) => { // "/user/name" will not work if we define this route after it
+  console.log("Middleware triggered");
+  next();
+});
+
+Requests that will trigger this middleware:
+
+/user
+/user/profile
+/user/123
+/user/settings/edit
+
+Requests that will NOT trigger it:
+
+/users
+/admin
+/product/user
+
+Because Express checks from the beginning of the path.
+
+
+==============================================================================================
+
+One Very Important  Point
+
+Order matters in Express.
+
+app.use((req,res,next)=>{
+  console.log("Middleware");
+  next();
+});
+
+app.get("/",(req,res)=>{
+  res.send("Home");
+});
+
+Request /:
+
+Middleware
+Home
+
+But if reversed:
+
+app.get("/",(req,res)=>{
+  res.send("Home");
+});
+
+app.use((req,res,next)=>{
+  console.log("Middleware");
+  next();
+});
+
+Middleware will never run.
+Because response already ended.
+
+
+
+| Feature        | `app.use()` | `app.get()`    | `router.use()`    |
+| -------------- | ----------- | -------------- | ----------------- |
+| Purpose        | Middleware  | Route handler  | Router middleware |
+| HTTP methods   | All         | Only GET       | All               |
+| Matching       | Prefix      | Exact route    | Prefix            |
+| Needs `next()` | Yes         | Usually no     | Yes               |
+| Scope          | Whole app   | Specific route | Router only       |
+
+
+
+
+
+
+Router is a way to group related routes into a separate module so your application code stays organized and modular.
+
+Environment variables (env) are external configuration values available to Node.js through process.env.
