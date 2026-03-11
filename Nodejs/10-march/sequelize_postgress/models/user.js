@@ -10,7 +10,20 @@ const User = sequelize.define("user", {
 
     name: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        validate: {
+            notEmpty: true,
+            len: [3, 50]
+        },
+        get(){
+            console.log("in getter this : " , this)
+            const rawValue = this.getDataValue("name");
+            return rawValue ? rawValue.toUpperCase() : null;
+        },
+        set(value){
+            let newValue = value.trim().toUpperCase();
+            this.setDataValue("name", newValue);
+        }
     },
 
     age: {
@@ -22,8 +35,13 @@ const User = sequelize.define("user", {
         type: Sequelize.STRING,
         allowNull: false,
         unique: true,
-    }
+        validate: {
+            isEmail: true
+        }
+    } 
 
+}, {
+    paranoid: true
 })
 
 export default User;
