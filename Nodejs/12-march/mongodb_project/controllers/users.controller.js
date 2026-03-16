@@ -4,8 +4,6 @@ import AppError from "../utils/AppError.js";
 
 export const addUser = async (req, res) => {
 
-    // try {
-
         const user = req.body;
 
         const error = validateUser(user)
@@ -20,21 +18,13 @@ export const addUser = async (req, res) => {
         const existingUser=await User.findOne({email:newUser.email});
 
         if(existingUser){
-            // return res.status(400).json({
-            //     success:false,
-            //     message:"User with this email already exists"
-            // })
-
               throw AppError("User with this email already exists" , 400)
         }
         
         const invalidId = validateCourses(courses);
 
         if(invalidId){
-            // return res.status(400).json({
-            //     success: false,
-            //     message: invalidId
-            // })
+
               throw AppError(invalidId , 400)
         }
         
@@ -43,10 +33,6 @@ export const addUser = async (req, res) => {
         console.log("Validated  ids of courses : : ", existingIds)
         
         if (existingIds.length !== courses.length) {
-            // return res.status(400).json({
-            //     success: false,
-            //     message: "Invalid course ids"
-            // })
               throw AppError("Invalid course ids" , 400)
         }
         
@@ -60,15 +46,6 @@ export const addUser = async (req, res) => {
             message: "User created Successfully",
             user: result
         })
-
-    // } catch (error) {
-    //     console.error("Thata ths error  : ", error)
-    //     res.status(500).json({
-    //         success: false,
-    //         message: error.message
-    //     })
-
-    // }
 
 }
 
