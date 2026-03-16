@@ -1,4 +1,5 @@
 import { body } from "express-validator";
+import Admin from "../models/admin.js";
 
 export const createAdminValidator = [
 
