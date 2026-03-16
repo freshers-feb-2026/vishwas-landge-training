@@ -7,6 +7,7 @@ import session from "express-session";
 import connectDB from "./lib/database.js";
 import orderRouter from "./routes/order.route.js"
 import dotenv from "dotenv"
+import { errorHandler } from "./middlewares/errorHandler.js";
 dotenv.config();
 
 
@@ -64,7 +65,7 @@ app.use("/admin", () => { //if next() is called then only run this code otherwis
     console.log("Admin route hit")
 })
 
-
+app.use(errorHandler)
 
 app.listen(3000, () => {
     console.log("Server is running on port 3000");

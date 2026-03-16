@@ -1,30 +1,35 @@
 import {Admin} from "../models/index.js";
+import AppError from "../utils/AppError.js";
 
 import { validateAdminData } from "../utils/index.js";
 import bcrypt from "bcrypt";
 
 export const createAdmin = async (req, res) => {
 
-    try {
+    // try {
 
         const { name, email, password } = req.body;
         const error = validateAdminData({ name, email, password });
 
         if (error) {
-            return res.status(400).json({
-                message: error,
-                success: false
+            // return res.status(400).json({
+            //     message: error,
+            //     success: false
 
-            })
+            // })
+
+            throw AppError(error , 400)
         }
 
         const exstingAdmin = await Admin.findOne({email})
 
         if (exstingAdmin) {
-            return res.status(404).json({
-                message: "Admin alredy exist.",
-                success: false,
-            })
+            // return res.status(422).json({
+            //     message: "Admin alredy exist.",
+            //     success: false,
+            // })
+
+             throw AppError("Admin alredy exist." , 422)
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -40,31 +45,34 @@ export const createAdmin = async (req, res) => {
         })
 
 
-    } catch (error) {
+    // } catch (error) {
 
-        res.status(500).json({
-            success: false,
-            message: error.message
+    //     res.status(500).json({
+    //         success: false,
+    //         message: error.message
 
-        })
+    //     })
 
-    }
+    // }
 }
 
 export const loginAdmin = async (req, res) => {
 
-    try {
+    // try {
 
         const { password, email } = req.body;
 
         const error = validateAdminData({ name:"default", email, password });
          
         if (error) {
-            return res.status(400).json({
-                message: error,
-                success: false
+            // return res.status(400).json({
+            //     message: error,
+            //     success: false
 
-            })
+            // })
+        
+            throw AppError(error , 400)
+
         }
 
         const admin = await Admin.findOne({ email })
@@ -79,10 +87,12 @@ export const loginAdmin = async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, admin.password);
 
         if (!isPasswordValid) {
-            return res.status(401).json({
-                message: "Invalid password.",
-                success: false,
-            });
+            // return res.status(401).json({
+            //     message: "Invalid password.",
+            //     success: false,
+            // });
+
+            throw AppError("Invalid password." , 401)
         }
 
         req.session.adminId = admin.id;
@@ -99,13 +109,13 @@ export const loginAdmin = async (req, res) => {
         });
 
 
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
+    // } catch (error) {
+    //     res.status(500).json({
+    //         success: false,
+    //         message: error.message
 
-        })
-    }
+    //     })
+    // }
 
 }
 
