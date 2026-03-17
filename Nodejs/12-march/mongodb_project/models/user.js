@@ -1,5 +1,18 @@
 import mongoose from "mongoose";
 
+const ProfileSchema = new mongoose.Schema({
+  bio: {
+    type: String,
+    maxlength: 500
+  },
+
+  address: {
+    type: String,
+    maxlength: 200
+  }
+}, {_id:false})
+
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -17,6 +30,11 @@ const userSchema = new mongoose.Schema(
       }
     },
 
+    courses: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Course"
+    }],
+
     age: {
       type: Number
     },
@@ -27,11 +45,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
     },
-
-    deletedAt: {
-      type: Date,
-      default: null
-    }
+    profile:ProfileSchema
   },
   {
     timestamps: true,
