@@ -9,30 +9,30 @@ export const createAdmin = async (req, res) => {
 
       console.log("The File  : " ,req.file);
       const image = req.file;
-      return res.status(200).json({
-         image : image.filename,
-         message:"testing"  
+    //   return res.status(200).json({
+    //      image : "http://localhost:3000/images/" +image.filename,
+    //      message:"testing"  
 
-      });
+    //   });
 
         const { name, email, password } = req.body;
         const error = validateAdminData({ name, email, password });
 
         if (error) {
 
-            throw AppError(error , 400)
+            throw new AppError(error , 400)
         }
 
         const exstingAdmin = await Admin.findOne({email})
 
         if (exstingAdmin) {
 
-             throw AppError("Admin alredy exist." , 422)
+             throw new AppError("Admin alredy exist." , 422)
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-
-        const CreatedAdmin = await Admin.insertOne({ name, email, password: hashedPassword, image:image.path })
+        const imageLink ="http://localhost:3000/images/" +image.filename
+        const CreatedAdmin = await Admin.insertOne({ name, email, password: hashedPassword, image : imageLink, })
         const { password: removePassword, ...admin } = CreatedAdmin.toJSON();
 
         console.log("Admin  : ==== ", admin)
@@ -53,7 +53,7 @@ export const loginAdmin = async (req, res) => {
          
         if (error) {
         
-            throw AppError(error , 400)
+            throw new AppError(error , 400)
 
         }
 
@@ -69,7 +69,7 @@ export const loginAdmin = async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, admin.password);
 
         if (!isPasswordValid) {
-            throw AppError("Invalid password." , 401)
+            throw new AppError("Invalid password." , 401)
         }
 
         req.session.adminId = admin.id;

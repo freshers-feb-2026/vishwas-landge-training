@@ -12,14 +12,14 @@ export const createOrder = async (req, res) => {
         const error = validateOrderData(orderData)
 
         if (error) {
-            throw AppError(error , 400)
+            throw new AppError(error , 400)
         }
 
         const user = User.findById(orderData.id);
 
         if (!user) {
 
-            throw AppError("User not found" , 404)
+            throw new AppError("User not found" , 404)
 
         }
 

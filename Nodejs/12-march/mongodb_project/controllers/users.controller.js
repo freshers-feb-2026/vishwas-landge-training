@@ -10,7 +10,7 @@ export const addUser = async (req, res) => {
 
         // console.log(error)
         if (error) {
-             throw AppError(error , 400)
+             throw new AppError(error , 400)
         }
 
         let { courses, ...newUser } = user;
@@ -18,14 +18,14 @@ export const addUser = async (req, res) => {
         const existingUser=await User.findOne({email:newUser.email});
 
         if(existingUser){
-              throw AppError("User with this email already exists" , 400)
+              throw new AppError("User with this email already exists" , 400)
         }
         
         const invalidId = validateCourses(courses);
 
         if(invalidId){
 
-              throw AppError(invalidId , 400)
+              throw new AppError(invalidId , 400)
         }
         
         let existingIds = await Course.find({ _id: { $in:courses } })
@@ -33,7 +33,7 @@ export const addUser = async (req, res) => {
         console.log("Validated  ids of courses : : ", existingIds)
         
         if (existingIds.length !== courses.length) {
-              throw AppError("Invalid course ids" , 400)
+              throw new AppError("Invalid course ids" , 400)
         }
         
         newUser.courses = courses;
@@ -58,7 +58,7 @@ export const getUser = async (req, res) => {
         const user = await User.findById(id).populate("courses");
         console.log("user : ", user)
         if (!user) {
-              throw AppError("User not found" , 404)
+              throw new AppError("User not found" , 404)
         }
 
         return res.status(201).json({
@@ -102,12 +102,12 @@ export const updateUser = async (req, res) => {
         const error = validateUser(newUser)
 
         if (error) {
-           throw AppError(error , 400)
+           throw new AppError(error , 400)
         }
 
         if (!user) {
 
-        throw AppError("User Not found" , 404)
+        throw new AppError("User Not found" , 404)
 
         }
 
@@ -141,7 +141,7 @@ export const deleteUser = async (req, res) => {
         console.log("The result delete   : ", result)
         if (!result) {
 
-            throw AppError("User Not found" , 404)
+            throw new AppError("User Not found" , 404)
         }
 
 
