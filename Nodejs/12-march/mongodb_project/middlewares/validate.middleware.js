@@ -6,10 +6,13 @@ export const validate = (req, res, next) => {
 
     if (!error.isEmpty()) {
 
+        console.log(error)
+
         return res.status(400).json({
 
             message: error.array()[0].msg,
-            success: false
+            success: false,
+            error
 
         })
 

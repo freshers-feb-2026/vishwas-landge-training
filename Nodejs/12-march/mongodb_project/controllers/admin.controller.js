@@ -5,7 +5,15 @@ import { validateAdminData } from "../utils/index.js";
 import bcrypt from "bcrypt";
 
 export const createAdmin = async (req, res) => {
+           
 
+      console.log("The File  : " ,req.file);
+      const image = req.file;
+      return res.status(200).json({
+         image : image.filename,
+         message:"testing"  
+
+      });
 
         const { name, email, password } = req.body;
         const error = validateAdminData({ name, email, password });
@@ -24,7 +32,7 @@ export const createAdmin = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const CreatedAdmin = await Admin.insertOne({ name, email, password: hashedPassword })
+        const CreatedAdmin = await Admin.insertOne({ name, email, password: hashedPassword, image:image.path })
         const { password: removePassword, ...admin } = CreatedAdmin.toJSON();
 
         console.log("Admin  : ==== ", admin)

@@ -7,9 +7,14 @@ import session from "express-session";
 import connectDB from "./lib/database.js";
 import orderRouter from "./routes/order.route.js"
 import dotenv from "dotenv"
+import path from "path"
+import { fileURLToPath } from "url";
 import { errorHandler } from "./middlewares/errorHandler.js";
 dotenv.config();
 
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 await connectDB();
 
@@ -42,6 +47,9 @@ store.on("connect", () => {
 });
 
 app.use(express.json());
+
+app.use("/images" ,express.static(path.join(__dirname , "images")))
+
 
 app.use((req, res, next) => {  //track req for debugging
      
