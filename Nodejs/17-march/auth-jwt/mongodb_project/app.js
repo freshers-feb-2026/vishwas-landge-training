@@ -21,6 +21,15 @@ const app = express();
 
 // console.log("This are env : " , process.env)
 
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"]
+  })
+);
+
 app.use(express.json());
 
 app.use("/images" ,express.static(path.join(__dirname , "images")))
