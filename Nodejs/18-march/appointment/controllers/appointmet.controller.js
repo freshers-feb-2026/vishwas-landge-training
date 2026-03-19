@@ -1,5 +1,6 @@
 import { Appointment, Availability, Doctor, Patient } from "../models/index.js";
 import AppError from "../utils/AppError.js";
+import { removeExpiredSlots } from "../utils/index.js";
 
 export const createAppointment = async (req, res) => {
 
@@ -13,19 +14,21 @@ export const createAppointment = async (req, res) => {
     const parsedDate = new Date(date);
     const weekday = parsedDate.getDay()
     const patient = await Patient.findOne({ where: { userId: req.user.id } })
+
     const availability = await Availability.findOne({
         where: { doctorId , weekday }
     });
-
-    console.log("availability.slots : ",availability.slots)
-    const isSlotExist = availability.slots.find((slot)=>{
-        return slot.start.slice(0,5)==start && slot.end.slice(0,5)==end
+    let slots=availability.slots;
+    slots = removeExpiredSlots(parsedDate, slots);
+    
+    const isSlotExist = slots.find((slot)=>{
+        return slot.start==start && slot.end==end
     })
     
 
     if(!isSlotExist){
         
-        throw new AppError("Slot is Already Booked" , 400) 
+        throw new AppError("Slot is Already Booked or invalid, please select another slot" , 400) 
 
     }
     
@@ -33,7 +36,7 @@ export const createAppointment = async (req, res) => {
         start, end, date, patientId: patient.id, doctorId});
 
 
-    const updatedSlots = availability.slots.filter((slot) => {
+    const updatedSlots = slots.filter((slot) => {
         return !(slot.start === start && slot.end === end);
     });
 
@@ -58,9 +61,6 @@ export const getSlots = async (req, res) => {
     const parsedDate = new Date(date);
     const weekday = parsedDate.getDay()
 
-    console.log("====== Week : " , weekday)
-
-
     const availability =await Availability.findOne({
         where: {
             doctorId,
@@ -72,28 +72,9 @@ export const getSlots = async (req, res) => {
         throw new AppError("Doctor is not available", 400)
     }
 
-    const now = new Date();
-
-    const isToday = parsedDate.toDateString() === now.toDateString();
     let slots=availability.slots;
-    // console.log("Is Today : " + " "+ now.toDateString() +" " , isToday )
 
-   if (isToday) {
-
-    const currentMinutes =
-        now.getHours() * 60 + now.getMinutes();
-
-    slots = slots.filter((slot) => {
-
-        const [hours, minutes] = slot.start.split(":").map(Number);
-
-        const slotMinutes = hours * 60 + minutes;
-
-        return slotMinutes > currentMinutes+10;
-
-    });
-
-   }
+    slots = removeExpiredSlots(parsedDate, slots);
 
     return res.status(200).json({
         message: "slots fetched Successfully",

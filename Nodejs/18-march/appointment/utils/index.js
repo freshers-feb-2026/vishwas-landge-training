@@ -22,3 +22,29 @@ export const generateSlots = (start, end, duration = 30) => {
 
   return slots;
 };
+
+export const removeExpiredSlots = (parsedDate, slots) => {
+
+  const now = new Date();
+  const isToday = parsedDate.toDateString() === now.toDateString();
+
+  if (isToday) {
+
+    const currentMinutes =
+      now.getHours() * 60 + now.getMinutes();
+
+    slots = slots.filter((slot) => {
+
+      const [hours, minutes] = slot.start.split(":").map(Number);
+
+      const slotMinutes = hours * 60 + minutes;
+
+      return slotMinutes > currentMinutes + 10;
+
+    });
+
+  }
+  return slots;
+
+
+}
