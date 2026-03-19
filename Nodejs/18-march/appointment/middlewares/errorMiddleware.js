@@ -8,7 +8,7 @@ const errorMiddleware = (err, req, res, next) => {
         })
 
     }else{
-        console.log("pROGRAMATIC ERROR : " , err)
+        console.log("PROGRAMATIC ERROR : " , err)
         return res.status(500).json({
             message: "Internal Server Error",
             success: false,

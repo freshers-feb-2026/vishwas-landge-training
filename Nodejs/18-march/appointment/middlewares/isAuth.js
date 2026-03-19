@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken"
-import { JWT_SECRET } from "../configs/config";
+import { JWT_SECRET } from "../configs/config.js";
+import AppError from "../utils/AppError.js";
 
 const isAuth = (req, res, next) => {
 
@@ -21,9 +22,17 @@ const isAuth = (req, res, next) => {
         })
     }
 
-
-    const decoded = jwt.verify(token , JWT_SECRET);
-    req.user = decoded;
+    try {
+        const decoded = jwt.verify(token , JWT_SECRET, {
+            maxAge:1000*60*60*60
+        });
+        
+        req.user = decoded;
+        next()
+        
+    } catch (error) {
+        throw new AppError("Token Expired or invalid" , 403)
+    }
 
 } 
 

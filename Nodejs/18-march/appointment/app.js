@@ -7,6 +7,7 @@ import sequelize from "./lib/database.js";
 import errorMiddleware from "./middlewares/errorMiddleware.js";
 import {User} from "./models/index.js"
 import adminRouter from "./routes/doctor.route.js"
+import appointmentRouter from "./routes/appointments.route.js"
 await sequelize.authenticate().then(()=>{
     console.log("DB Connected Successfully :  == > " , DB_DATABASE)
 })
@@ -36,6 +37,7 @@ app.use((req,res,next)=>{
 
 app.use("/users" ,userRouter);
 app.use("/doctors" ,adminRouter);
+app.use("/appointments" , appointmentRouter)
 
 
 app.get("/", (req,res)=>{

@@ -15,6 +15,24 @@ export const createAvaibility = async (req, res) => {
     }
 
     const slots = generateSlots(start, end);
+    const existing = await Availability.findOne({ where: { weekday } });
+    
+    if (existing) {
+
+        const result = await existing.update({
+            start,
+            end,
+            isAvailable,
+        })
+
+        return res.status(201).json({
+            message: "Avaibility Updated Successfully",
+            success: true,
+            avaibility: result.toJSON()
+        })
+
+    }
+
 
     const newAvaibility = await Availability.create({
         weekday,
@@ -31,5 +49,22 @@ export const createAvaibility = async (req, res) => {
         success:true,
         avaibility:newAvaibility.toJSON()
     })
+
+}
+
+
+export const getAllAvaibility = async(req,res)=>{
+  
+    const {doctorId} = req.params;
+
+    const avaibilities = await Availability.findAll({where:{doctorId}})
+     
+    res.status(200).json({
+        message:"Avaibility fetched Successfully",
+        success:true,
+        avaibility:avaibilities
+    })
+
+
 
 }
