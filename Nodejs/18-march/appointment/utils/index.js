@@ -48,3 +48,16 @@ export const removeExpiredSlots = (parsedDate, slots) => {
 
 
 }
+
+export const checkCanCancelAppointment = (date, start, end) => {
+
+    const now = new Date();
+
+    const appointmentTime = new Date(`${date}T${start}`);
+
+    const diff = appointmentTime - now;
+
+    const diffHours = diff / (1000 * 60 * 60);
+
+    return diffHours >= 2;
+};

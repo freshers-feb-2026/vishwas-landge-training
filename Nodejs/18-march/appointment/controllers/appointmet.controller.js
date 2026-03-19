@@ -1,6 +1,7 @@
+import { ROLE } from "../constants/index.js";
 import { Appointment, Availability, Doctor, Patient } from "../models/index.js";
 import AppError from "../utils/AppError.js";
-import { removeExpiredSlots } from "../utils/index.js";
+import { checkCanCancelAppointment, removeExpiredSlots } from "../utils/index.js";
 
 export const createAppointment = async (req, res) => {
 
@@ -27,13 +28,13 @@ export const createAppointment = async (req, res) => {
     
 
     if(!isSlotExist){
-        
+        console.log(" ")
         throw new AppError("Slot is Already Booked or invalid, please select another slot" , 400) 
 
     }
     
     const newAppointment = await Appointment.create({
-        start, end, date, patientId: patient.id, doctorId});
+        start, end, date, patientId: patient.id, doctorId , weekday});
 
 
     const updatedSlots = slots.filter((slot) => {
@@ -54,6 +55,47 @@ export const createAppointment = async (req, res) => {
 
 }
 
+
+export const cancelAppointment = async(req,res)=>{
+
+    const {appointmentId} =req.params;
+    const appointment  = await Appointment.findByPk(appointmentId);
+
+    console.log(appointment)
+    let {date , start , end }= appointment;
+
+    start=start.slice(0,5)
+    end=end.slice(0,5)
+
+    const patient = await Patient.findByPk(appointment.patientId);
+
+    if(req.user.id != patient.userId){
+       
+        throw new AppError("Appointment does not belong to you" , 403)
+
+    }
+
+    if(checkCanCancelAppointment(date , start , end)==true){
+        
+        throw new AppError("Can only cancel Appointment before timing of appointment 2 hours before" , 400)
+        
+    }
+
+   const updated =  await appointment.update({isCanceled : true})
+  
+   const avaibility =  await Availability.findOne({where :{doctorId:appointment.doctorId, weekday:appointment.weekday}})
+    
+    const newSlots = [{start , end} , ...avaibility.slots];
+    await avaibility.update({slots:newSlots})
+
+    return res.status(200).json({
+        message: "Appointment Canceled Successfully",
+        success: true,
+        appointment:updated
+    })
+
+}
+
 export const getSlots = async (req, res) => {
 
 
@@ -61,7 +103,7 @@ export const getSlots = async (req, res) => {
     const parsedDate = new Date(date);
     const weekday = parsedDate.getDay()
 
-    const availability =await Availability.findOne({
+    const availability = await Availability.findOne({
         where: {
             doctorId,
             weekday
@@ -82,4 +124,30 @@ export const getSlots = async (req, res) => {
         slots
     })
 
+}
+
+export const getAllAppointments = async(req, res)=>{
+
+    const userId = req.user.id;
+    let appointments;
+    if (req.user.role == ROLE.DOCTOR) {
+       
+        const doctor = await Doctor.findOne({where : {userId}});
+        appointments = await Appointment.find({ where: { doctorId: doctor.id } });
+
+    }else{
+         
+        const patient = await Patient.findOne({where : {userId}});
+        appointments = await Appointment.find({ where: { patient: patient.id } });
+
+    }
+
+
+    return res.status(200).json({
+        message: "Appointment fetched Successfully",
+        success: true,
+        appointment: appointments
+    })
+    
+    
 }

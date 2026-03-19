@@ -13,6 +13,11 @@ const Appointment = sequelize.define("appointment", {
 
     },
 
+    weekday: {
+        type: DataTypes.INTEGER,
+        // allowNull: false
+    },
+
     patientId: {
         type: DataTypes.INTEGER,
         references: {
@@ -43,7 +48,7 @@ const Appointment = sequelize.define("appointment", {
         allowNull: false
     },
 
-    iscanceled: {
+    isCanceled: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
     }
