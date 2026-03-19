@@ -149,5 +149,5 @@ export const getAllAppointments = async(req, res)=>{
         appointment: appointments
     })
     
-    
+
 }

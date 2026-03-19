@@ -68,3 +68,14 @@ export const getAllAvaibility = async(req,res)=>{
 
 
 }
+
+export const getDoctors = async (req, res) => {
+
+    const doctors = await Doctor.findAll();
+    res.status(200).json({
+        message: "Doctors fetched successfully",
+        success: true,
+        doctors
+    })
+
+}
