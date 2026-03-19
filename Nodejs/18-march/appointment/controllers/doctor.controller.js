@@ -57,6 +57,10 @@ export const getAllAvaibility = async(req,res)=>{
   
     const {doctorId} = req.params;
 
+    if (!doctorId || isNaN(doctorId) || Number(doctorId) <= 0) {
+        throw new AppError("Invalid doctorId", 400);
+    }
+
     const avaibilities = await Availability.findAll({where:{doctorId}})
      
     res.status(200).json({

@@ -8,9 +8,9 @@ import jwt from "jsonwebtoken"
 
 export const createUser = async (req, res) => {
 
-    const { name, email, password, role, phone, ...profile } = req.body;
+    const { name, email, password, role, ...profile } = req.body;
 
-    const existingUser = await User.findOne({ where: { email } })
+    const existingUser = await User.scope(null).findOne({ where: { email } })
 
     if (existingUser) {
 
@@ -20,7 +20,9 @@ export const createUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    const newUser = await User.create({ email, password: hashedPassword, role, phone, name })
+    const newUser = await User.create({ email, password: hashedPassword, role, name })
+    const userData = newUser.toJSON();
+    delete userData.password;
 
     if (ROLE.DOCTOR == role) {
 
@@ -29,7 +31,7 @@ export const createUser = async (req, res) => {
             message: "User Doctor created successfully",
             success: true,
             user: {
-                ...newUser.toJSON(),
+                ...newUser,
                 doctor
             }
         })
@@ -41,7 +43,7 @@ export const createUser = async (req, res) => {
             message: "User Patient created successfully",
             success: true,
             user: {
-                ...newUser.toJSON(),
+                ...userData,
                 patient
             }
         })
@@ -55,7 +57,7 @@ export const loginUser = async (req, res) => {
 
     const { email, password } = req.body;
 
-    const user = await User.findOne({
+    const user = await User.scope(null).findOne({
         where: {
             email
         }
@@ -78,7 +80,7 @@ export const loginUser = async (req, res) => {
         email: user.email,
         role: user.role
     }
-    const token = jwt.sign(payload, JWT_SECRET)
+    const token = jwt.sign(payload, JWT_SECRET ,{ expiresIn: "1h" })
 
 
     return res.status(200).json({
@@ -89,5 +91,36 @@ export const loginUser = async (req, res) => {
         user: payload
 
     })
+
+}
+
+export const getAllUsers = async (req, res) => {
+
+    const users = await User.findAll({ raw: true });
+
+    const usersWithTokens = users.map((user) => {
+
+        const payload = {
+            id: user.id,
+            email: user.email,
+            role: user.role
+        }
+
+        const token = jwt.sign(payload, JWT_SECRET, {
+            expiresIn: "1h"
+        })
+
+
+        return { ...user, token };
+
+    })
+
+    return res.json({
+        message: "Users fetched successfully (DEV)",
+        success: true,
+        users: usersWithTokens
+    })
+
+
 
 }

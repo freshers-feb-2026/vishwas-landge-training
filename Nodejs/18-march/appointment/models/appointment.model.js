@@ -15,7 +15,7 @@ const Appointment = sequelize.define("appointment", {
 
     weekday: {
         type: DataTypes.INTEGER,
-        // allowNull: false
+        allowNull: false
     },
 
     patientId: {

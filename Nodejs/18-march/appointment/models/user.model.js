@@ -33,6 +33,10 @@ const User = sequelize.define("user", {
         allowNull:false
     },
 
+}, {
+    defaultScope: {
+        attributes: { exclude: ["password"] }
+    }
 })
 
 export default User;

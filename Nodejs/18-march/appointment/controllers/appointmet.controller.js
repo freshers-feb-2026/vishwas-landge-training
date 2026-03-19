@@ -7,18 +7,32 @@ export const createAppointment = async (req, res) => {
 
     const { doctorId } = req.params;
 
+    if (!doctorId || isNaN(doctorId) || Number(doctorId) <= 0) {
+        throw new AppError("Invalid doctorId", 400);
+    }
+
     const {
         start,
         end,
         date } = req.body;
 
     const parsedDate = new Date(date);
+
+    if (isNaN(parsedDate.getTime())) {
+        throw new AppError("Invalid date format", 400);
+    }
+
     const weekday = parsedDate.getDay()
     const patient = await Patient.findOne({ where: { userId: req.user.id } })
 
     const availability = await Availability.findOne({
         where: { doctorId , weekday }
     });
+    
+    if(!availability){
+        throw new AppError("Doctor is not Available" , 400)
+    }
+
     let slots=availability.slots;
     slots = removeExpiredSlots(parsedDate, slots);
     
@@ -59,8 +73,14 @@ export const createAppointment = async (req, res) => {
 export const cancelAppointment = async(req,res)=>{
 
     const {appointmentId} =req.params;
+    
+    if (!appointmentId || isNaN(appointmentId) || Number(appointmentId) <= 0) {
+        throw new AppError("Invalid doctorId", 400);
+    }
     const appointment  = await Appointment.findByPk(appointmentId);
-
+    if(!appointment){
+        throw new AppError("Invalid Appointment Id")
+    }
     console.log(appointment)
     let {date , start , end }= appointment;
 
@@ -100,7 +120,16 @@ export const getSlots = async (req, res) => {
 
 
     const { doctorId, date } = req.params;
+    
+    if (!doctorId || isNaN(doctorId) || Number(doctorId) <= 0) {
+        throw new AppError("Invalid doctorId", 400);
+    }
+
     const parsedDate = new Date(date);
+
+    if (isNaN(parsedDate.getTime())) {
+        throw new AppError("Invalid date format", 400);
+    }
     const weekday = parsedDate.getDay()
 
     const availability = await Availability.findOne({
@@ -133,12 +162,12 @@ export const getAllAppointments = async(req, res)=>{
     if (req.user.role == ROLE.DOCTOR) {
        
         const doctor = await Doctor.findOne({where : {userId}});
-        appointments = await Appointment.find({ where: { doctorId: doctor.id } });
+        appointments = await Appointment.findAll({ where: { doctorId: doctor.id } });
 
     }else{
          
         const patient = await Patient.findOne({where : {userId}});
-        appointments = await Appointment.find({ where: { patient: patient.id } });
+        appointments = await Appointment.findAll({ where: { patientId: patient.id } });
 
     }
 
@@ -146,6 +175,7 @@ export const getAllAppointments = async(req, res)=>{
     return res.status(200).json({
         message: "Appointment fetched Successfully",
         success: true,
+        user:req.user,
         appointment: appointments
     })
     
