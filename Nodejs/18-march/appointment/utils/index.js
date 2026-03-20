@@ -1,3 +1,5 @@
+import { differenceInHours } from "date-fns";
+
 export const generateSlots = (start, end, duration = 30) => {
 
   const slots = [];
@@ -31,7 +33,7 @@ export const removeExpiredSlots = (parsedDate, slots) => {
   if (isToday) {
 
     const currentMinutes =
-      now.getHours() * 60 + now.getMinutes();
+      now.getHours() * 60 + now.getMinutes(); //to min
 
     slots = slots.filter((slot) => {
 
@@ -39,7 +41,8 @@ export const removeExpiredSlots = (parsedDate, slots) => {
 
       const slotMinutes = hours * 60 + minutes;
 
-      return slotMinutes > currentMinutes + 10;
+      return slotMinutes > currentMinutes + 10; //to compare in min
+      // only care about time
 
     });
 
@@ -48,6 +51,13 @@ export const removeExpiredSlots = (parsedDate, slots) => {
 
 
 }
+
+
+// export const checkCanCancelAppointment = (date, start) => {
+//   const appointment = new Date(`${date}T${start}`);
+//   return differenceInHours(appointment, new Date()) >= 2;
+// };
+
 
 export const checkCanCancelAppointment = (date, start, end) => {
 
